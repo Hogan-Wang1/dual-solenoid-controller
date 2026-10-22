@@ -1,82 +1,135 @@
-# Dual-Channel Solenoid Valve Controller
+# 双通道电磁阀控制项目：需求整理与电路方案评审
 
-A dual-channel solenoid valve driver board with independently adjustable pulse voltage (0–30V), pulse width (1ms step), frequency (0.01–10Hz), and channel delay (50ms step).
+本仓库用于整理双通道电磁阀控制项目中的个人工作，包括项目需求、电路方案评审记录，以及后续计划开展的 LabVIEW 控制前端重构。
 
-## Project Background
+当前仓库以工程文档为主，尚未包含经过实物验证的完整控制系统。后续重新开发的程序将作为独立的补充工作记录，不视为原项目软件的恢复版本。
 
-This project reconstructs a legacy dual-channel solenoid control system. The original design only reached the schematic and PCB draft stage. This repository documents the complete closed-loop reconstruction: PCB fabrication, hardware assembly, firmware, LabVIEW host software, and a low-cost oscilloscope built with an Arduino ADC for waveform verification without professional lab equipment.
+## 1. 项目背景
 
-## System Architecture
+本项目围绕双通道电磁阀控制需求开展前期设计与方案落地准备。
 
-LabVIEW Host (PC)
-│ USB Serial
-▼
-Arduino / ESP32 ──► DAC ──► Op-Amp ──► MOSFET ──► Solenoid / LED Load
-│ │
-└──────── ADC ◄── Voltage Divider ◄────┘
-(custom oscilloscope)
+本人在原项目中参与了 LabVIEW 控制前端初稿开发、电路图初稿绘制、既有电路方案审查，以及按照项目负责人要求编写项目需求等工作。
 
+目前，原始 LabVIEW 文件和本人绘制的电路图初稿已无法获取。本仓库因此主要保留目前可追溯的需求文档与评审记录，并明确区分原项目工作和后续补充开发。
 
-## Key Specifications
+## 2. 个人贡献与工作边界
 
-| Parameter | Value |
-|---|---|
-| Channels | 2 (independent, synchronized) |
-| Output Voltage | 0–30V, adjustable, 0.01V resolution (calibrated) |
-| Pulse Width | Adjustable, 1ms minimum step |
-| Frequency | 0.01–10Hz |
-| Channel Delay | 50ms minimum step |
-| Pulse Count / Duration | Configurable |
+| 工作内容 | 本人贡献 | 当前资料状态 | 说明 |
+|---|---|---|---|
+| LabVIEW 控制前端初稿 | 开发前端初稿 | 原文件已无法获取 | 暂无可供复核的原始程序 |
+| 电路图初稿 | 绘制初版电路图 | 原文件已无法获取 | 不作为已验证的硬件设计展示 |
+| 既有电路方案审查 | 审查项目中提供的电路方案，整理问题与待确认事项 | 已整理为评审表格 | 被审查方案并非本人独立设计 |
+| 项目需求编写 | 根据项目负责人要求编写并整理需求 | 已完成整理 | 不等同于本人独立制定全部系统需求 |
+| 后续硬件搭建与测试 | 未参与 | 无本人执行的测试记录 | 不属于本仓库的个人成果 |
+| LabVIEW 前端重新开发 | 计划开展 | 尚未完成 | 将单独记录开发与测试过程 |
 
-## Repository Structure
+> 本仓库不宣称本人完成了原系统的整机交付、电路修复、实物功能验证或可靠性验证。
 
-- `labview/` — LabVIEW host VI files
-- `arduino/firmware/` — Main control firmware
-- `arduino/oscilloscope/` — Custom ADC-based oscilloscope firmware
-- `python/` — Real-time waveform plotting script
-- `hardware/` — Gerber, schematic, BOM
-- `simulation/` — LTspice simulation files
-- `docs/` — Troubleshooting manual and design review
-- `media/` — Waveform screenshots and demo video link
+## 3. 当前仓库内容
 
-## Core Challenge: No Oscilloscope
+### 3.1 项目需求
 
-The lab lacks a professional oscilloscope. To verify the 1ms pulse width and the inductive load freewheeling protection, an Arduino ADC samples the output through a resistor divider and streams data over serial to a Python/Serial Plotter display. This low-cost approach successfully captured the MOSFET drain voltage spike and confirmed the effectiveness of the freewheeling diode.
+整理原项目中的控制需求与约束条件，为理解系统功能和后续软件开发提供依据。
 
-## Status
+需求文档反映需求整理工作，不代表其中所有功能均已实现或验证。
 
-- [ ] LTspice simulation
-- [ ] PCB fabrication
-- [ ] Hardware assembly
-- [ ] Firmware development
-- [ ] LabVIEW integration
-- [ ] Custom oscilloscope validation
-- [ ] Demo video
+### 3.2 电路方案评审
 
-## License
+通过表格记录对既有方案的审查意见，包括发现的问题、判断依据以及待确认事项。
 
-MIT
+评审结论应区分：
 
+- **可由图纸、器件资料或计算支持的判断**；
+- **需要补充资料才能确认的问题**；
+- **需要实物测试才能验证的假设**。
 
-dual-solenoid-controller/
+在缺少实测证据时，评审意见不作为故障根因确认或整改有效性的证明。
+
+### 3.3 后续 LabVIEW 开发
+
+计划重新开发双通道控制前端，并结合 LabVIEW 基础能力学习与初级考核准备开展。
+
+新程序将明确标注为后续重构版本，不冒充已经遗失的原始程序。
+
+## 4. 建议目录结构
+
+以下为仓库组织规划，尚未完成的内容可暂不创建对应文件。
+
+```text
+.
 ├── README.md
-├── LICENSE
-├── .gitignore
-├── labview/                  # LabVIEW 上位机 .vi 文件
-├── arduino/
-│   ├── firmware/             # 主控固件 .ino
-│   └── oscilloscope/         # 自制示波器 .ino
-├── python/
-│   └── plotter.py            # 实时波形绘图脚本
-├── hardware/
-│   ├── gerber/               # 嘉立创导出 Gerber
-│   ├── schematic/            # 原理图 PDF / 图片
-│   └── bom.csv               # BOM 清单
-├── simulation/
-│   └── ltspice/              # LTspice .asc 仿真文件
 ├── docs/
-│   ├── troubleshooting.md    # 排障手册
-│   └── design_review.md      # 设计复盘
-└── media/
-    ├── waveform_screenshots/ # 波形截图
-    └── demo_video_link.md    # 演示视频链接
+│   ├── requirements/          # 整理后的项目需求
+│   ├── circuit-review/        # 电路方案评审表
+│   └── development-notes/     # 后续开发记录
+├── labview/                  # 后续重构程序，完成后加入
+└── tests/                    # 后续测试用例与结果，完成后加入
+```
+
+## 5. 后续开发计划
+
+- [x] 整理项目需求文档
+- [x] 整理电路方案评审表
+- [ ] 重新定义 LabVIEW 前端的软件功能与接口
+- [ ] 开发双通道控制前端
+- [ ] 编写软件测试用例
+- [ ] 记录运行环境、依赖与使用方法
+- [ ] 明确是否具备实际硬件接入与验证条件
+
+后续软件开发将优先形成范围明确、可复现的成果，不以重建原项目全部硬件为目标。
+
+### 拟考虑的软件功能
+
+以下为待确认的开发方向，不代表已实现功能：
+
+- 双通道控制指令输入；
+- 控制指令与界面状态显示；
+- 输入检查与错误提示；
+- 操作日志记录；
+- 模拟设备接口。
+
+具体实现范围将依据整理后的需求和可投入时间确定。
+
+## 6. 测试与验证边界
+
+当前仓库未提供本人完成的实物电磁阀测试结果。
+
+后续测试将按实际条件分别记录：
+
+| 验证层级 | 可以证明的内容 | 不能直接证明的内容 |
+|---|---|---|
+| 软件模拟测试 | 控制逻辑、界面交互、模拟异常处理 | 实际电气输出或阀门动作 |
+| 输出接口测试 | 控制信号或输出接口在测试条件下的表现 | 实际阀门动作及流路通断 |
+| 实物功能测试 | 实际测试范围内的系统功能 | 未测工况、长期寿命或完整可靠性 |
+
+如果使用模拟接口，程序和测试记录将明确标注“模拟模式”。
+
+在没有实际反馈信号时，界面状态仅表示软件指令或预期状态，不表示已经确认的阀门实际状态。
+
+## 7. 已知限制
+
+- 原始 LabVIEW 程序与本人绘制的电路图初稿已无法获取；
+- 本人未参与原项目后续硬件搭建与测试；
+- 本人未取得供应商修改后的完整版本；
+- 电路评审中的部分判断仍可能需要资料核对或实物验证；
+- 后续重新开发的软件不代表原系统已完成整改；
+- 当前内容不适合作为可直接部署的设备控制方案。
+
+## 8. 资料来源与公开范围
+
+本仓库区分本人编写的内容与基于他人方案形成的评审内容。
+
+涉及实验室、项目负责人、其他设计人员或供应商的资料，仅在获得公开许可并完成必要脱敏后上传。未经许可的原始图纸、内部参数和沟通记录不纳入公开仓库。
+
+评审表的整理与分析属于本人工作，但不因此主张被评审方案的设计归属。
+
+## 9. 项目目标
+
+本仓库用于展示以下工作过程：
+
+- 将项目要求整理为可追溯的需求文档；
+- 对既有电路方案进行审查并记录判断依据；
+- 明确个人贡献、资料缺失与验证边界；
+- 通过后续软件开发补充可复现的工程成果。
+
+本项目不以已经完成整机开发或产品交付作为成果定位。
